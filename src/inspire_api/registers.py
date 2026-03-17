@@ -1,11 +1,9 @@
 """Register address mappings for different hardware generations."""
 
-from typing import Dict, Tuple, Union
-
 # Register addresses for Generation 3 hardware
 # Note: These addresses are verified through reverse engineering
 # Use validation methods for manufacturer verification
-REGISTERS_GEN3: Dict[str, int] = {
+REGISTERS_GEN3: dict[str, int] = {
     "HAND_ID": 1000,
     "REDU_RATIO": 1001,
     "CLEAR_ERROR": 1004,
@@ -46,7 +44,7 @@ REGISTERS_GEN3: Dict[str, int] = {
 
 # Register addresses for Generation 4 hardware
 # Includes all Gen3 registers plus tactile sensors and network config
-REGISTERS_GEN4: Dict[str, Union[int, Tuple[int, Tuple[int, int]]]] = {
+REGISTERS_GEN4: dict[str, int | tuple[int, tuple[int, int]]] = {
     "HAND_ID": 1000,
     "REDU_RATIO": 1001,
     "CLEAR_ERROR": 1004,
@@ -93,7 +91,7 @@ REGISTERS_GEN4: Dict[str, Union[int, Tuple[int, Tuple[int, int]]]] = {
 
 def get_registers(
     generation: int,
-) -> Dict[str, Union[int, Tuple[int, Tuple[int, int]]]]:
+) -> dict[str, int | tuple[int, tuple[int, int]]]:
     """
     Get the appropriate register dictionary for the given hardware generation.
 
@@ -152,7 +150,7 @@ def categorize_register(reg_name: str) -> str:
 
 def validate_register_address(
     reg_name: str, generation: int
-) -> Union[int, Tuple[int, Tuple[int, int]]]:
+) -> int | tuple[int, tuple[int, int]]:
     """
     Validate and get the address for a register.
 

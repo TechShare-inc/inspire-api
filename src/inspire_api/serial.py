@@ -258,6 +258,9 @@ class InspireHandSerial(InspireHandBase):
                 "Serial connection not established. Call connect() first."
             )
 
+        # Clear input buffer to remove any stale data before sending write command
+        self._ser.read_all()
+
         # Validate register address
         valid_addrs = set()
         for v in self._regdict.values():
@@ -289,9 +292,7 @@ class InspireHandSerial(InspireHandBase):
 
         self._ser.write(bytearray(frame))
 
-        # Drain echo/ACK using precise busy-wait sleep (Windows timer resolution
-        # is ~15 ms, so bare time.sleep() would over-sleep by 10×).
-        _precise_sleep(0.003)
+        _precise_sleep(SERIAL_READ_DELAY)
         self._ser.read_all()
 
         return True
@@ -315,6 +316,9 @@ class InspireHandSerial(InspireHandBase):
             raise CommunicationError(
                 "Serial connection not established. Call connect() first."
             )
+
+        # Clear input buffer to remove any stale data before sending read command
+        self._ser.read_all()
 
         # Build frame
         frame = [SERIAL_START_BYTE_1, SERIAL_START_BYTE_2]

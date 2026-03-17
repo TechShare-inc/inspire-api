@@ -31,8 +31,12 @@ def main():
         time.sleep(2)
 
         # Read current position
-        current_pos = hand.get_angle_actual()
+        current_pos = hand.get_pos_actual()
         print(f"Current position: {current_pos}")
+
+        # Read current angle
+        current_angle = hand.get_angle_actual()
+        print(f"Current angle: {current_angle}")
 
         # Set specific angles for each joint
         print("\nSetting joint angles to [500, 500, 500, 500, 500, 0]...")
