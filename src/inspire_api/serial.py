@@ -16,6 +16,7 @@ elif os.name == "nt":
 from .base import InspireHandBase
 from .constants import (
     DEFAULT_BAUDRATE,
+    DEFAULT_COMMAND_INTERVAL,
     DEFAULT_HAND_ID,
     DEFAULT_PORT,
     SERIAL_CMD_READ,
@@ -88,11 +89,21 @@ class InspireHandSerial(InspireHandBase):
         baudrate: int = DEFAULT_BAUDRATE,
         generation: int = 3,
         debug: bool = False,
+        command_interval: float = DEFAULT_COMMAND_INTERVAL,
     ):
         super().__init__(generation=generation, debug=debug)
         self._port = port
         self._baudrate = baudrate
         self._ser = None  # type: ignore
+        self._command_interval = command_interval
+        self._last_command_time: float = 0.0
+
+    def _throttle(self) -> None:
+        """Enforce the minimum inter-command interval."""
+        elapsed = time.perf_counter() - self._last_command_time
+        if elapsed < self._command_interval:
+            _precise_sleep(self._command_interval - elapsed)
+        self._last_command_time = time.perf_counter()
 
     def _validate_com_port(self) -> bool:
         """Validate that the COM port exists on the system."""
@@ -258,6 +269,8 @@ class InspireHandSerial(InspireHandBase):
                 "Serial connection not established. Call connect() first."
             )
 
+        self._throttle()
+
         # Clear input buffer to remove any stale data before sending write command
         self._ser.read_all()
 
@@ -288,7 +301,10 @@ class InspireHandSerial(InspireHandBase):
         frame.append(checksum)
 
         if self._debug:
-            self._logger.debug(f"Writing to register {addr} for hand {hand_id}: {val}")
+            self._logger.debug(
+                f"Writing to register 0x{addr:04X} for hand {hand_id}: {val}"
+                f" | TX: {bytearray(frame).hex(' ')}"
+            )
 
         self._ser.write(bytearray(frame))
 
@@ -317,6 +333,8 @@ class InspireHandSerial(InspireHandBase):
                 "Serial connection not established. Call connect() first."
             )
 
+        self._throttle()
+
         # Clear input buffer to remove any stale data before sending read command
         self._ser.read_all()
 
@@ -335,7 +353,8 @@ class InspireHandSerial(InspireHandBase):
 
         if self._debug:
             self._logger.debug(
-                f"Reading {num} bytes from register {addr} for hand {hand_id}"
+                f"Reading {num} bytes from register 0x{addr:04X} for hand {hand_id}"
+                f" | TX: {bytearray(frame).hex(' ')}"
             )
 
         self._ser.write(bytearray(frame))
@@ -371,7 +390,8 @@ class InspireHandSerial(InspireHandBase):
 
         if self._debug:
             self._logger.debug(
-                f"Read {actual_data_len} values from register {addr}: {val}"
+                f"Read {actual_data_len} values from register 0x{addr:04X}: {val}"
+                f" | RX: {recv.hex(' ')}"
             )
 
         return val
