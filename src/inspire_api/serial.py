@@ -2,7 +2,6 @@
 
 import os
 import time
-from typing import List, Optional
 
 import numpy as np
 import numpy.typing as npt
@@ -16,7 +15,6 @@ elif os.name == "nt":
 
 from .base import InspireHandBase
 from .constants import (
-    BUFFER_CLEAR_DELAY,
     DEFAULT_BAUDRATE,
     DEFAULT_HAND_ID,
     DEFAULT_PORT,
@@ -37,6 +35,27 @@ from .utils import (
     validate_forces,
     validate_speeds,
 )
+
+
+def _precise_sleep(duration: float) -> None:
+    """High-resolution sleep for short durations.
+
+    Windows ``time.sleep()`` has ~15 ms timer resolution, so calling it for
+    durations shorter than ~16 ms will over-sleep.  This helper only delegates
+    to ``time.sleep`` when there is enough headroom (> 16 ms remaining after
+    leaving a 1 ms busy-wait buffer); otherwise it goes straight to a
+    ``time.perf_counter`` busy-wait — the same strategy used by
+    ``dexim.core.nodes.utils.RateLimiter``.
+
+    Args:
+        duration: Desired sleep duration in seconds.
+    """
+    deadline = time.perf_counter() + duration
+    remaining = duration - 0.001
+    if remaining > 0.016:  # only sleep when safely above Windows timer resolution
+        time.sleep(remaining)
+    while time.perf_counter() < deadline:
+        pass
 
 
 class InspireHandSerial(InspireHandBase):
@@ -216,7 +235,7 @@ class InspireHandSerial(InspireHandBase):
         return self._write_register(hand_id, self._regdict["FORCE_SET"], 12, val_bytes)
 
     def _write_register(
-        self, hand_id: int, addr: int, num: int, val: List[int]
+        self, hand_id: int, addr: int, num: int, val: list[int]
     ) -> bool:
         """
         Write to a register via serial protocol.
@@ -270,15 +289,14 @@ class InspireHandSerial(InspireHandBase):
 
         self._ser.write(bytearray(frame))
 
-        # Clear response buffer
-        time.sleep(BUFFER_CLEAR_DELAY)
-        while self._ser.in_waiting > 0:
-            self._ser.read_all()
-            time.sleep(BUFFER_CLEAR_DELAY)
+        # Drain echo/ACK using precise busy-wait sleep (Windows timer resolution
+        # is ~15 ms, so bare time.sleep() would over-sleep by 10×).
+        _precise_sleep(0.003)
+        self._ser.read_all()
 
         return True
 
-    def _read_register(self, hand_id: int, addr: int, num: int) -> List[int]:
+    def _read_register(self, hand_id: int, addr: int, num: int) -> list[int]:
         """
         Read from a register via serial protocol.
 
@@ -318,7 +336,7 @@ class InspireHandSerial(InspireHandBase):
 
         self._ser.write(bytearray(frame))
 
-        time.sleep(SERIAL_READ_DELAY)
+        _precise_sleep(SERIAL_READ_DELAY)
         recv = self._ser.read_all()
 
         if recv is None or len(recv) == 0:
@@ -354,7 +372,7 @@ class InspireHandSerial(InspireHandBase):
 
         return val
 
-    def _read6(self, hand_id: int, reg_name: str) -> List[int]:
+    def _read6(self, hand_id: int, reg_name: str) -> list[int]:
         """Read 6 bytes from a named register."""
         if reg_name not in self._regdict:
             raise ValidationError(
@@ -376,7 +394,7 @@ class InspireHandSerial(InspireHandBase):
 
         return val_act
 
-    def _read12(self, hand_id: int, reg_name: str) -> List[int]:
+    def _read12(self, hand_id: int, reg_name: str) -> list[int]:
         """Read 12 bytes from a named register and convert to 6 16-bit values."""
         if reg_name not in self._regdict:
             raise ValidationError(
@@ -540,7 +558,7 @@ class InspireHandSerial(InspireHandBase):
         return validation_results
 
     def export_register_verification_report(
-        self, hand_id: int = DEFAULT_HAND_ID, filepath: Optional[str] = None
+        self, hand_id: int = DEFAULT_HAND_ID, filepath: str | None = None
     ) -> str:
         """
         Export a comprehensive report for manufacturer verification of register addresses.
