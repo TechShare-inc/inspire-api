@@ -1,7 +1,6 @@
 """Abstract base class for Inspire Hand controllers."""
 
 from abc import ABC, abstractmethod
-from typing import Dict
 
 import numpy as np
 import numpy.typing as npt
@@ -40,7 +39,7 @@ class InspireHandBase(ABC):
         self._connected = False
 
     @property
-    def _regdict(self) -> Dict:
+    def _regdict(self) -> dict:
         """Get the appropriate register dictionary based on generation."""
         return get_registers(self._generation)
 

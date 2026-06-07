@@ -27,7 +27,7 @@ class TestInspireHandSerial:
 
     def test_set_angle_type_validation(self, sample_angles):
         """Test that set_angle requires numpy array."""
-        hand = InspireHandSerial(generation=3)
+        InspireHandSerial(generation=3)  # noqa: F841
         # This should work
         angles_array = np.array([100, 100, 100, 100, 100, 0], dtype=np.int32)
         # Would raise error if called without connection, but we're testing type validation
@@ -35,7 +35,7 @@ class TestInspireHandSerial:
 
     def test_set_angle_length_validation(self):
         """Test that set_angle validates array length."""
-        hand = InspireHandSerial(generation=3)
+        InspireHandSerial(generation=3)  # noqa: F841
         # Wrong length array should raise ValidationError when validated
         wrong_length = np.array([100, 100, 100], dtype=np.int32)
         with pytest.raises(ValidationError):

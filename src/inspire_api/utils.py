@@ -1,6 +1,5 @@
 """Utility functions for Inspire Hand API."""
 
-from typing import List, Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -78,7 +77,7 @@ def validate_forces(forces: npt.NDArray[np.integer]) -> npt.NDArray[np.int32]:
     return validate_joint_values(forces, "force", MIN_FORCE, MAX_FORCE)
 
 
-def int16_to_bytes(value: int) -> Tuple[int, int]:
+def int16_to_bytes(value: int) -> tuple[int, int]:
     """
     Convert a 16-bit integer to low and high bytes.
 
@@ -123,7 +122,7 @@ def calculate_checksum(data: bytes) -> int:
     return checksum & BYTE_MASK
 
 
-def convert_to_modbus_values(values: npt.NDArray[np.int32]) -> List[int]:
+def convert_to_modbus_values(values: npt.NDArray[np.int32]) -> list[int]:
     """
     Convert joint values to Modbus register format.
 
@@ -142,7 +141,7 @@ def convert_to_modbus_values(values: npt.NDArray[np.int32]) -> List[int]:
     return val_reg
 
 
-def convert_to_serial_bytes(values: npt.NDArray[np.int32]) -> List[int]:
+def convert_to_serial_bytes(values: npt.NDArray[np.int32]) -> list[int]:
     """
     Convert joint values to serial byte format (12 bytes for 6 joints).
 
@@ -160,7 +159,7 @@ def convert_to_serial_bytes(values: npt.NDArray[np.int32]) -> List[int]:
     return val_bytes
 
 
-def parse_serial_response(data: bytes, expected_length: int) -> List[int]:
+def parse_serial_response(data: bytes, expected_length: int) -> list[int]:
     """
     Parse serial response data.
 
@@ -190,7 +189,7 @@ def parse_serial_response(data: bytes, expected_length: int) -> List[int]:
     return values
 
 
-def convert_12bytes_to_6values(bytes_data: List[int]) -> List[int]:
+def convert_12bytes_to_6values(bytes_data: list[int]) -> list[int]:
     """
     Convert 12 bytes to 6 16-bit values.
 
@@ -216,7 +215,7 @@ def convert_12bytes_to_6values(bytes_data: List[int]) -> List[int]:
 
 
 def reshape_tactile_data(
-    raw_data: List[int], rows: int, cols: int, is_palm: bool = False
+    raw_data: list[int], rows: int, cols: int, is_palm: bool = False
 ) -> npt.NDArray[np.int32]:
     """
     Reshape raw tactile sensor data into proper matrix format.

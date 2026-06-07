@@ -1,6 +1,5 @@
 """Unit tests for Modbus TCP communication module."""
 
-import numpy as np
 import pytest
 
 from inspire_api.constants import DEFAULT_MODBUS_IP, DEFAULT_MODBUS_PORT

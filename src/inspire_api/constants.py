@@ -67,7 +67,9 @@ PLACEHOLDER_VALUE_16BIT = 0xFFFF
 # Timing Constants
 SERIAL_READ_DELAY = 0.005  # seconds
 BUFFER_CLEAR_DELAY = 0.001  # seconds
-DEFAULT_COMMAND_INTERVAL = 0.005  # seconds; minimum time between successive serial commands
+DEFAULT_COMMAND_INTERVAL = (
+    0.005  # seconds; minimum time between successive serial commands
+)
 
 # Data Conversion Constants
 BYTE_MASK = 0xFF

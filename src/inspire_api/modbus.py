@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import time
-from typing import List
 
 import numpy as np
 import numpy.typing as npt
@@ -194,7 +193,7 @@ class InspireHandModbus(InspireHandBase):
         val_reg = convert_to_modbus_values(forces_validated)
         return self._write_register(self._regdict["FORCE_SET"], val_reg)
 
-    def _write_register(self, address: int, values: List[int]) -> bool:
+    def _write_register(self, address: int, values: list[int]) -> bool:
         """
         Write to Modbus registers.
 
@@ -225,7 +224,7 @@ class InspireHandModbus(InspireHandBase):
                 f"Failed to write to register {address}: {e}"
             ) from e
 
-    def _read_register(self, address: int, count: int) -> List[int]:
+    def _read_register(self, address: int, count: int) -> list[int]:
         """
         Read from Modbus registers with automatic segmentation for large reads.
 
@@ -316,7 +315,7 @@ class InspireHandModbus(InspireHandBase):
                 f"Failed to read from register {address}: {e}"
             ) from e
 
-    def _read6_16bit(self, reg_name: str) -> List[int]:
+    def _read6_16bit(self, reg_name: str) -> list[int]:
         """Read 6 16-bit values from a named register."""
         if reg_name not in self._regdict:
             raise ValidationError(
@@ -335,7 +334,7 @@ class InspireHandModbus(InspireHandBase):
 
         return val
 
-    def _read6_8bit(self, reg_name: str) -> List[int]:
+    def _read6_8bit(self, reg_name: str) -> list[int]:
         """Read 6 8-bit values from a named register (3 Modbus registers split into bytes)."""
         if reg_name not in self._regdict:
             raise ValidationError(
