@@ -45,7 +45,7 @@ def _precise_sleep(duration: float) -> None:
     durations shorter than ~16 ms will over-sleep.  This helper only delegates
     to ``time.sleep`` when there is enough headroom (> 16 ms remaining after
     leaving a 1 ms busy-wait buffer); otherwise it goes straight to a
-    ``time.perf_counter`` busy-wait — the same strategy used by
+    ``time.perf_counter`` busy-wait -- the same strategy used by
     ``dexim.core.nodes.utils.RateLimiter``.
 
     Args:
@@ -554,7 +554,7 @@ class InspireHandSerial(InspireHandBase):
 
                 if validation_results[reg_name]:
                     self._logger.debug(
-                        f"✓ Register '{reg_name}' (addr: {self._regdict[reg_name]}) is readable"
+                        f"[OK] Register '{reg_name}' (addr: {self._regdict[reg_name]}) is readable"
                     )
                 else:
                     self._logger.warning(
@@ -629,7 +629,7 @@ class InspireHandSerial(InspireHandBase):
 
             for reg_name in sorted(registers):
                 status = (
-                    "✓ PASS" if validation_results.get(reg_name, False) else "✗ FAIL"
+                    "[OK] PASS" if validation_results.get(reg_name, False) else "✗ FAIL"
                 )
                 addr = self._regdict[reg_name]
                 if isinstance(addr, tuple):

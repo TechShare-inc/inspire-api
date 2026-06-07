@@ -680,7 +680,7 @@ class InspireHandModbus(InspireHandBase):
 
                 if validation_results[reg_name]:
                     self._logger.debug(
-                        f"✓ Register '{reg_name}' (addr: {self._regdict[reg_name]}) is readable"
+                        f"[OK] Register '{reg_name}' (addr: {self._regdict[reg_name]}) is readable"
                     )
                 else:
                     self._logger.warning(
