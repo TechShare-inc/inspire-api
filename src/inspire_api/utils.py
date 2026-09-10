@@ -1,6 +1,5 @@
 """Utility functions for Inspire Hand API."""
 
-
 import numpy as np
 import numpy.typing as npt
 
